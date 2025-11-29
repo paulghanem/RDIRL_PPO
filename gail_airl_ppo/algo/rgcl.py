@@ -42,9 +42,9 @@ class RGCL(PPO):
         n_theta = len(self.theta)
         self.n_features = n_theta  # Store for later use
 
-        self.P =1e-4* torch.eye(n_theta)
+        self.P =1e-1* torch.eye(n_theta)
 
-        self.Q =1e-6*torch.eye(n_theta)
+        self.Q =1e-4*torch.eye(n_theta)
   
 
 
@@ -70,7 +70,7 @@ class RGCL(PPO):
             return  # Skip PPO update
 
         if step%self.rollout_length==0:
-            self.P=1e-4
+             self.P=1e-1
             
         self.learning_steps_disc += 1
 
@@ -126,6 +126,7 @@ class RGCL(PPO):
         # Update PPO using estimated rewards.
         self.update_ppo(
             states, actions, rewards, dones, log_pis, next_states, writer=None)
+        print(self.P)
 
     def update_disc(self, states,
                     states_exp):
