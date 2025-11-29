@@ -42,9 +42,9 @@ class RGCL(PPO):
         n_theta = len(self.theta)
         self.n_features = n_theta  # Store for later use
 
-        self.P =1e-2* torch.eye(n_theta)
+        self.P =1e-4* torch.eye(n_theta)
 
-        self.Q =1e-5*torch.eye(n_theta)
+        self.Q =1e-6*torch.eye(n_theta)
   
 
 
@@ -69,8 +69,8 @@ class RGCL(PPO):
             self.update_disc(states, states_exp)
             return  # Skip PPO update
 
-        # if step%self.rollout_length==0:
-        #     self.P=1e-2
+        if step%self.rollout_length==0:
+            self.P=1e-4
             
         self.learning_steps_disc += 1
 
@@ -198,13 +198,12 @@ class RGCL(PPO):
             cost = functional_call(self.disc, param_dict, state_batch).squeeze()
 
             # 3. Compute Gradient
-            grads = torch.autograd.grad(cost, theta_input, create_graph=True)[0]
+            grads = torch.autograd.grad(cost, theta_input)[0]
 
-            # 4. Compute exact Hessian matrix
-            hessian = torch.zeros(len(grads), len(grads), device=self.device)
-            for i in range(len(grads)):
-                grad2 = torch.autograd.grad(grads[i], theta_input, retain_graph=True)[0]
-                hessian[i] = grad2
+            # 4. Compute Fisher Information Matrix approximation
+            # F ≈ g * g^T (outer product)
+            # This is a rank-1 approximation, much faster than full Hessian
+            fisher_approx = torch.outer(grads, grads)
 
-            return grads.detach(), hessian.detach()
+            return grads.detach(), fisher_approx.detach()
 
