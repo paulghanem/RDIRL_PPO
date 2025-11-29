@@ -15,7 +15,7 @@ class RGCL(PPO):
                  batch_size=64, lr_actor=3e-4, lr_critic=3e-4, lr_disc=3e-5,
                  units_actor=(64, 64), units_critic=(64, 64),
                  units_disc=(16, 16), units_disc_v=(100, 100),
-                 epoch_ppo=5, epoch_disc=1, clip_eps=0.2, lambd=0.97,
+                 epoch_ppo=1, epoch_disc=1, clip_eps=0.2, lambd=0.97,
                  coef_ent=0.0, max_grad_norm=10.0,name=None):
         super().__init__(
             state_shape, action_shape, device, seed, gamma, rollout_length,
