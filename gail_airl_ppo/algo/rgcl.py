@@ -42,9 +42,9 @@ class RGCL(PPO):
         n_theta = len(self.theta)
         self.n_features = n_theta  # Store for later use
 
-        self.P =1e-1* torch.eye(n_theta)
+        self.P =1e-4* torch.eye(n_theta)
 
-        self.Q =1e-3*torch.eye(n_theta)
+        self.Q =1e-6*torch.eye(n_theta)
   
 
 
@@ -118,6 +118,8 @@ class RGCL(PPO):
                 indices = list(range(start_idx + self.buffer.total_size, self.buffer.total_size)) + \
                           list(range(0, end_idx))
                 idxes = indices
+                
+                
         if step%self.rollout_length==0:
             #states, actions, _, dones, log_pis, next_states = self.buffer.get_sample(idxes)
             states, actions, _, dones, log_pis, next_states = self.buffer.get()
