@@ -67,6 +67,7 @@ class Trainer:
             state, _ = self.env.reset()
 
         print("Starting training loop...")
+       
         for step in range(1, self.num_steps + 1):
             # Pass to the algorithm to update state and episode timestep.
             

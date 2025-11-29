@@ -69,7 +69,8 @@ class RGCL(PPO):
             self.update_disc(states, states_exp)
             return  # Skip PPO update
 
-
+      
+            
         self.learning_steps_disc += 1
 
         # Samples from current policy's trajectories.
@@ -96,7 +97,7 @@ class RGCL(PPO):
         end_idx = self.buffer._p
         available = min(self.buffer._n, self.batch_size)  # Don't try to get more than we have
 
-        self.epoch_ppo = 1
+       
         
         if available < self.batch_size:
             # Not enough samples yet - get what we have
