@@ -126,7 +126,7 @@ class RGCL(PPO):
         # Update PPO using estimated rewards.
         self.update_ppo(
             states, actions, rewards, dones, log_pis, next_states, writer=None)
-        print(self.P)
+        
 
     def update_disc(self, states,
                     states_exp):
