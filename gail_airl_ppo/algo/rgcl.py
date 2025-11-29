@@ -164,7 +164,7 @@ class RGCL(PPO):
         # Update Mean
         grad_diff = grad_d - grad_s
         update_step = torch.matmul(P_new, grad_diff)
-        self.theta = self.theta -  update_step
+        self.theta = self.theta +  update_step
         self.P = P_new
         self.disc.set_theta(self.theta)
     
