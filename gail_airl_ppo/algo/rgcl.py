@@ -42,9 +42,9 @@ class RGCL(PPO):
         n_theta = len(self.theta)
         self.n_features = n_theta  # Store for later use
 
-        self.P =1e-1* torch.eye(n_theta)
+        self.P =1e-2* torch.eye(n_theta)
 
-        self.Q =1e-4*torch.eye(n_theta)
+        self.Q =1e-5*torch.eye(n_theta)
   
 
 
@@ -96,6 +96,8 @@ class RGCL(PPO):
         end_idx = self.buffer._p
         available = min(self.buffer._n, self.batch_size)  # Don't try to get more than we have
 
+        self.epoch_ppo = 1
+        
         if available < self.batch_size:
             # Not enough samples yet - get what we have
             if end_idx >= available:
@@ -116,7 +118,6 @@ class RGCL(PPO):
                 idxes = indices
 
         states, actions, _, dones, log_pis, next_states = self.buffer.get_sample(idxes)
-
         # Calculate rewards (RGCL only needs states).
         rewards = self.disc.calculate_reward(states)
     
@@ -151,13 +152,13 @@ class RGCL(PPO):
         S = P_pred_inv + hessian_d - hessian_s
         
         # Regularize and Invert
-        S = S + 1e-5 * torch.eye(self.n_features, device=self.device)
+      
         P_new = torch.linalg.inv(S)
         
         # Update Mean
         grad_diff = grad_d - grad_s
         update_step = torch.matmul(P_new, grad_diff)
-        self.theta = self.theta +  update_step
+        self.theta = self.theta -  update_step
         self.P = P_new
         self.disc.set_theta(self.theta)
     

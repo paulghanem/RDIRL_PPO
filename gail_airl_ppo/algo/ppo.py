@@ -119,6 +119,7 @@ class PPO(Algorithm):
         loss_critic.backward(retain_graph=False)
         nn.utils.clip_grad_norm_(self.critic.parameters(), self.max_grad_norm)
         self.optim_critic.step()
+        #print(loss_critic)
 
         #if self.learning_steps_ppo % self.epoch_ppo == 0:
            # writer.add_scalar(
