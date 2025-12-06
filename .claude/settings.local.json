@@ -5,7 +5,9 @@
       "Bash(python collect_demo.py:*)",
       "Bash(where:*)",
       "Bash(C:Userssiliconsynapseanaconda3condabinconda.bat run -n gail-ppo python collect_demo.py --cuda)",
-      "Bash(C:/Users/siliconsynapse/anaconda3/envs/gail-ppo/python.exe collect_demo.py)"
+      "Bash(C:/Users/siliconsynapse/anaconda3/envs/gail-ppo/python.exe collect_demo.py)",
+      "Bash(cat:*)",
+      "Bash(\"/c/Users/siliconsynapse/anaconda3/envs/gail-ppo/python.exe\" train_RGCL.py --algo rgcl_avg --num_steps 50000 --eval_interval 10000 --rollout_length 2048 --env_id HalfCheetah-v4)"
     ],
     "deny": [],
     "ask": []

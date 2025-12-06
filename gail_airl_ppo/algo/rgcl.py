@@ -12,10 +12,10 @@ class RGCL(PPO):
 
     def __init__(self, buffer_exp, state_shape, action_shape, device, seed,
                  gamma=0.995, rollout_length=10000, mix_buffer=1,
-                 batch_size=64, lr_actor=3e-4, lr_critic=3e-4, lr_disc=3e-5,
-                 units_actor=(16, 16), units_critic=(16, 16),
-                 units_disc=(16, 16), units_disc_v=(100, 100),
-                 epoch_ppo=10, epoch_disc=1, clip_eps=0.2, lambd=0.97,
+                 batch_size=2, lr_actor=3e-4, lr_critic=3e-4, lr_disc=3e-5,
+                 units_actor=(64, 64), units_critic=(64, 64),
+                 units_disc=(64, 64), units_disc_v=(100, 100),
+                 epoch_ppo=1, epoch_disc=1, clip_eps=0.2, lambd=0.97,
                  coef_ent=0.0, max_grad_norm=10.0,name=None):
         super().__init__(
             state_shape, action_shape, device, seed, gamma, rollout_length,
@@ -120,15 +120,15 @@ class RGCL(PPO):
                 idxes = indices
                 
                 
-        if step%self.rollout_length==0:
-            #states, actions, _, dones, log_pis, next_states = self.buffer.get_sample(idxes)
-            states, actions, _, dones, log_pis, next_states = self.buffer.get()
-            # Calculate rewards (RGCL only needs states).
-            rewards = self.disc.calculate_reward(states)
-        
-            # Update PPO using estimated rewards.
-            self.update_ppo(
-                states, actions, rewards, dones, log_pis, next_states, writer=None)
+        #if step%self.rollout_length==0:
+        states, actions, _, dones, log_pis, next_states = self.buffer.get_sample(idxes)
+        #states, actions, _, dones, log_pis, next_states = self.buffer.get()
+        # Calculate rewards (RGCL only needs states).
+        rewards = self.disc.calculate_reward(states)
+    
+        # Update PPO using estimated rewards.
+        self.update_ppo(
+            states, actions, rewards, dones, log_pis, next_states, writer=None)
         
 
     def update_disc(self, states,

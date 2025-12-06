@@ -11,7 +11,7 @@ class AIRL(PPO):
 
     def __init__(self, buffer_exp, state_shape, action_shape, device, seed,
                  gamma=0.995, rollout_length=10000, mix_buffer=1,
-                 batch_size=1, lr_actor=3e-4, lr_critic=3e-4, lr_disc=3e-5,
+                 batch_size=64, lr_actor=3e-4, lr_critic=3e-4, lr_disc=3e-4,
                  units_actor=(64, 64), units_critic=(64, 64),
                  units_disc_r=(100, 100), units_disc_v=(100, 100),
                  epoch_ppo=50, epoch_disc=10, clip_eps=0.2, lambd=0.97,

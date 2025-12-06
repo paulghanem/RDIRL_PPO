@@ -13,7 +13,7 @@ class GAIL(PPO):
                  gamma=0.995, rollout_length=50000, mix_buffer=1,
                  batch_size=64, lr_actor=3e-4, lr_critic=3e-4, lr_disc=3e-4,
                  units_actor=(64, 64), units_critic=(64, 64),
-                 units_disc=(100, 100), epoch_ppo=50, epoch_disc=10,
+                 units_disc=(256, 256), epoch_ppo=50, epoch_disc=10,
                  clip_eps=0.2, lambd=0.97, coef_ent=0.0, max_grad_norm=10.0,name=None):
         super().__init__(
             state_shape, action_shape, device, seed, gamma, rollout_length,
@@ -37,7 +37,7 @@ class GAIL(PPO):
         self.batch_size = batch_size
         self.epoch_disc = epoch_disc
 
-    def update(self, writer,step):
+    def update(self, step):
         self.learning_steps += 1
 
         for _ in range(self.epoch_disc):
@@ -49,7 +49,7 @@ class GAIL(PPO):
             states_exp, actions_exp = \
                 self.buffer_exp.sample(self.batch_size)[:2]
             # Update discriminator.
-            self.update_disc(states, actions, states_exp, actions_exp, writer)
+            self.update_disc(states, actions, states_exp, actions_exp, writer=None)
 
         # We don't use reward signals here,
         states, actions, _, dones, log_pis, next_states = self.buffer.get()
@@ -59,7 +59,7 @@ class GAIL(PPO):
 
         # Update PPO using estimated rewards.
         self.update_ppo(
-            states, actions, rewards, dones, log_pis, next_states, writer)
+            states, actions, rewards, dones, log_pis, next_states, writer=None)
 
     def update_disc(self, states, actions, states_exp, actions_exp, writer):
         # Output of discriminator is (-inf, inf), not [0, 1].
@@ -75,7 +75,7 @@ class GAIL(PPO):
         loss_disc.backward()
         self.optim_disc.step()
 
-        if self.learning_steps_disc % self.epoch_disc == 0:
+        if self.learning_steps_disc % self.epoch_disc == 0 and writer is not None:
             writer.add_scalar(
                 'loss/disc', loss_disc.item(), self.learning_steps)
 

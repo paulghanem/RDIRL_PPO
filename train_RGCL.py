@@ -60,7 +60,7 @@ if __name__ == '__main__':
     p.add_argument('--num_steps', type=int, default=10**5)
     p.add_argument('--eval_interval', type=int, default=1000)
     p.add_argument('--env_id', type=str, default='HalfCheetah-v4')
-    p.add_argument('--algo', type=str, default='rgcl')
+    p.add_argument('--algo', type=str, default='rgcl_avg')
     p.add_argument('--cuda', action='store_true')
     p.add_argument('--seed', type=int, default=0)
     args = p.parse_args()
