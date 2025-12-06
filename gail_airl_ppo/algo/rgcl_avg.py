@@ -100,8 +100,8 @@ class RGCL_AVG(AVG):
                 if end_idx >= available:
                     idxes = slice(end_idx - available, end_idx)
                 else:
-                    start = self.buffer.total_size - (available - end_idx)
-                    indices = list(range(start, self.buffer.total_size)) + \
+                    start = self.buffer.buffer_size - (available - end_idx)
+                    indices = list(range(start, self.buffer.buffer_size)) + \
                              list(range(0, end_idx))
                     idxes = indices
             else:
@@ -109,8 +109,8 @@ class RGCL_AVG(AVG):
                 if start_idx >= 0:
                     idxes = slice(start_idx, end_idx)
                 else:
-                    indices = list(range(start_idx + self.buffer.total_size,
-                                       self.buffer.total_size)) + \
+                    indices = list(range(start_idx + self.buffer.buffer_size,
+                                       self.buffer.buffer_size)) + \
                              list(range(0, end_idx))
                     idxes = indices
 
