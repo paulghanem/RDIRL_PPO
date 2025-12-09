@@ -64,7 +64,7 @@ if __name__ == '__main__':
     p = argparse.ArgumentParser()
     p.add_argument('--algo', type=str, default='avg', choices=['avg', 'ppo', 'sac'],
                    help='Algorithm to use for training expert')
-    p.add_argument('--num_steps', type=int, default=500000)
+    p.add_argument('--num_steps', type=int, default=5000000)
     p.add_argument('--eval_interval', type=int, default=1000)
     p.add_argument('--env_id', type=str, default='HalfCheetah-v4')
     p.add_argument('--cuda', action='store_true')

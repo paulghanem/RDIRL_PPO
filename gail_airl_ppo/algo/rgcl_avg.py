@@ -89,40 +89,19 @@ class RGCL_AVG(AVG):
             # Update cost function using Kalman filter
             self.update_disc(states, states_exp)
 
-        # Get the most recent transition for AVG update
-        if self.buffer._n >= self.batch_size:
-            # Get recent batch for policy update
-            end_idx = self.buffer._p
-            available = min(self.buffer._n, self.batch_size)
-
-            if available < self.batch_size:
-                # Not enough samples yet
-                if end_idx >= available:
-                    idxes = slice(end_idx - available, end_idx)
-                else:
-                    start = self.buffer.buffer_size - (available - end_idx)
-                    indices = list(range(start, self.buffer.buffer_size)) + \
-                             list(range(0, end_idx))
-                    idxes = indices
-            else:
-                start_idx = end_idx - self.batch_size
-                if start_idx >= 0:
-                    idxes = slice(start_idx, end_idx)
-                else:
-                    indices = list(range(start_idx + self.buffer.buffer_size,
-                                       self.buffer.buffer_size)) + \
-                             list(range(0, end_idx))
-                    idxes = indices
-
+        # Get the most recent transition for AVG update (online learning)
+        if self.buffer._n >= 1:
+            # Get the most recent sample (AVG is an online algorithm)
+            most_recent_idx = (self.buffer._p - 1) % self.buffer.buffer_size
             states, actions, _, dones, next_states = \
-                self.buffer.get_sample(idxes)
+                self.buffer.get_sample(most_recent_idx)
 
-            # Use first transition for online AVG update
-            state = states[0] if states.dim() > 1 else states
-            action = actions[0] if actions.dim() > 1 else actions
-            done = dones[0].item() if dones.dim() > 0 else dones.item()
+            # Extract single transition
+            state = states if states.dim() == 1 else states.squeeze(0)
+            action = actions if actions.dim() == 1 else actions.squeeze(0)
+            done = dones.item() if dones.dim() > 0 else dones
             log_pi = self.last_log_pi  # Use stored log_pi from step()
-            next_state = next_states[0] if next_states.dim() > 1 else next_states
+            next_state = next_states if next_states.dim() == 1 else next_states.squeeze(0)
 
             # Calculate reward from RGCL cost function
             with torch.no_grad():
@@ -194,8 +173,8 @@ class RGCL_AVG(AVG):
         state_batch = state_input.unsqueeze(0) if state_input.dim() == 1 else state_input
         cost = functional_call(self.disc, param_dict, state_batch).squeeze()
 
-        # Compute gradient
-        grads = torch.autograd.grad(cost, theta_input)[0] / max(1, self.buffer._n)
+        # Compute gradient (normalize by constant rollout_length for consistent scaling)
+        grads = torch.autograd.grad(cost, theta_input)[0] / self.rollout_length
 
         # Compute Fisher Information Matrix approximation
         # F ≈ g * g^T (outer product)
