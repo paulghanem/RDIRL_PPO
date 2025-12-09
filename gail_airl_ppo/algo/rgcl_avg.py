@@ -50,6 +50,7 @@ class RGCL_AVG(AVG):
         self.n_features = n_theta
 
         # Kalman filter matrices
+        self.P_init = P_init  # Store initial value for resetting
         self.P = P_init * torch.eye(n_theta, device=device)  # Covariance matrix
         self.Q = Q_init * torch.eye(n_theta, device=device)  # Process noise
 
@@ -64,7 +65,10 @@ class RGCL_AVG(AVG):
     def update(self, writer=None, step=None):
         """Update cost function and AVG policy"""
         self.learning_steps += 1
-        pdb.set_trace()
+
+        # Reset P covariance matrix at the end of each rollout for numerical stability
+        if step is not None and step % self.rollout_length == 0:
+            self.P = self.P_init * torch.eye(self.n_features, device=self.device)
 
         # Update discriminator/cost function periodically
         if self.learning_steps % self.disc_update_freq == 0 and self.buffer._n >= 1:
