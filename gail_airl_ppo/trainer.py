@@ -79,7 +79,7 @@ class Trainer:
             if self.algo.is_update(step,self.algo.name):
                 
                 #self.algo.update(self.writer,step)
-                self.algo.update(step)
+                self.algo.update(step=step)
                
                 if step % 100 == 0:
                     print(f"Step {step}/{self.num_steps}")

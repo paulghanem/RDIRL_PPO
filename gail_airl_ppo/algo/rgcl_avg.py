@@ -2,6 +2,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 from torch.optim import Adam, SGD
+import pdb
 
 from .avg import AVG
 from gail_airl_ppo.network import RGCLCost
@@ -63,6 +64,7 @@ class RGCL_AVG(AVG):
     def update(self, writer=None, step=None):
         """Update cost function and AVG policy"""
         self.learning_steps += 1
+        pdb.set_trace()
 
         # Update discriminator/cost function periodically
         if self.learning_steps % self.disc_update_freq == 0 and self.buffer._n >= 1:
