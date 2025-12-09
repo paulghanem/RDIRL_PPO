@@ -71,7 +71,7 @@ class RGCL(PPO):
 
         # if step%self.rollout_length==0:
         #      self.P=1e-1
-            
+
         self.learning_steps_disc += 1
 
         # Samples from current policy's trajectories.
@@ -94,12 +94,12 @@ class RGCL(PPO):
         # Use sample instead of get for RGCL per-step updates
         #if step % self.rollout_length == 0:
 
-        # Get last batch_size samples (handles circular buffer wraparound)
+        # # Get last batch_size samples (handles circular buffer wraparound)
         end_idx = self.buffer._p
         available = min(self.buffer._n, self.batch_size)  # Don't try to get more than we have
 
-       
-        
+
+
         if available < self.batch_size:
             # Not enough samples yet - get what we have
             if end_idx >= available:
@@ -118,14 +118,14 @@ class RGCL(PPO):
                 indices = list(range(start_idx + self.buffer.total_size, self.buffer.total_size)) + \
                           list(range(0, end_idx))
                 idxes = indices
-                
-                
+
+
         #if step%self.rollout_length==0:
         states, actions, _, dones, log_pis, next_states = self.buffer.get_sample(idxes)
         #states, actions, _, dones, log_pis, next_states = self.buffer.get()
         # Calculate rewards (RGCL only needs states).
         rewards = self.disc.calculate_reward(states)
-    
+
         # Update PPO using estimated rewards.
         self.update_ppo(
             states, actions, rewards, dones, log_pis, next_states, writer=None)

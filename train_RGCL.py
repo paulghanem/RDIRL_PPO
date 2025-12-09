@@ -27,15 +27,23 @@ def run(args):
         device=torch.device("cuda" if args.cuda else "cpu")
     )
 
-    algo = ALGOS[args.algo](
-        buffer_exp=buffer_exp,
-        state_shape=env.observation_space.shape,
-        action_shape=env.action_space.shape,
-        device=torch.device("cuda" if args.cuda else "cpu"),
-        seed=args.seed,
-        rollout_length=args.rollout_length,
-        name=args.algo
-    )
+    # Build algorithm arguments
+    algo_kwargs = {
+        'buffer_exp': buffer_exp,
+        'state_shape': env.observation_space.shape,
+        'action_shape': env.action_space.shape,
+        'device': torch.device("cuda" if args.cuda else "cpu"),
+        'seed': args.seed,
+        'rollout_length': args.rollout_length,
+        'name': args.algo
+    }
+
+    # Add Kalman filter parameters for RGCL algorithms
+    if 'rgcl' in args.algo:
+        algo_kwargs['P'] = args.P
+        algo_kwargs['Q'] = args.Q
+
+    algo = ALGOS[args.algo](**algo_kwargs)
 
     time = datetime.now().strftime("%Y%m%d-%H%M")
     log_dir = os.path.join(
@@ -63,5 +71,8 @@ if __name__ == '__main__':
     p.add_argument('--algo', type=str, default='rgcl_avg')
     p.add_argument('--cuda', action='store_true')
     p.add_argument('--seed', type=int, default=0)
+    # Kalman filter parameters for RGCL algorithms
+    p.add_argument('--P', type=float, default=1e-3, help='Initial covariance matrix scale')
+    p.add_argument('--Q', type=float, default=1e-6, help='Process noise matrix scale')
     args = p.parse_args()
     run(args)

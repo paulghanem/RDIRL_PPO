@@ -129,7 +129,7 @@ class PPO(Algorithm):
         log_pis = self.actor.evaluate_log_pi(states, actions)
         entropy = -log_pis.mean()
 
-        ratios = (log_pis - log_pis_old).exp()
+        ratios = (log_pis - log_pis_old).exp_()
         loss_actor1 = -ratios * gaes
         loss_actor2 = -torch.clamp(
             ratios,
@@ -142,7 +142,8 @@ class PPO(Algorithm):
         (loss_actor - self.coef_ent * entropy).backward(retain_graph=False)
         nn.utils.clip_grad_norm_(self.actor.parameters(), self.max_grad_norm)
         self.optim_actor.step()
-
+        
+        #print(loss_actor)
         #if self.learning_steps_ppo % self.epoch_ppo == 0:
             #writer.add_scalar(
              #   'loss/actor', loss_actor.item(), self.learning_steps)

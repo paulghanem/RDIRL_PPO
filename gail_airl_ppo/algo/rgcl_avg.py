@@ -21,7 +21,7 @@ class RGCL_AVG(AVG):
                  units_actor=(256, 256), units_critic=(256, 256),
                  units_disc=(16, 16), alpha=0.07, beta1=0.0,
                  max_grad_norm=10.0, disc_update_freq=1,
-                 Q_init=1e-6, P_init=1e-4, name=None):
+                 P=1e-4, Q=1e-6, name=None):
         # Use rollout_length as buffer_size for compatibility
         if buffer_size is None:
             buffer_size = rollout_length
@@ -50,9 +50,9 @@ class RGCL_AVG(AVG):
         self.n_features = n_theta
 
         # Kalman filter matrices
-        self.P_init = P_init  # Store initial value for resetting
-        self.P = P_init * torch.eye(n_theta, device=device)  # Covariance matrix
-        self.Q = Q_init * torch.eye(n_theta, device=device)  # Process noise
+        self.P_init = P  # Store initial value for resetting
+        self.P = P * torch.eye(n_theta, device=device)  # Covariance matrix
+        self.Q = Q * torch.eye(n_theta, device=device)  # Process noise
 
         self.learning_steps_disc = 0
         self.batch_size = batch_size
